@@ -12,6 +12,7 @@ export default function LandingForm() {
   const [area, setArea] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isUpdate, setUpdate] = useState(false);
 
   const [formData, setFormData] = useState<LeadPayload>({
     name: "",
@@ -59,11 +60,18 @@ export default function LandingForm() {
 
       console.log("Submitting:", formData); // debug
 
-      await submitLead(formData);
+      const result = await submitLead(formData);
 
+      const data = result.data;
+
+      const isUpdate = new Date(data.updatedAt).getTime() !== new Date(data.createdAt).getTime();
+
+      setUpdate(isUpdate);
       setSubmitted(true);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+     catch (error: any) {
       console.error("Submission error:", error);
       alert(error.message); // actual backend message
     } finally {
@@ -71,7 +79,7 @@ export default function LandingForm() {
     }
   };
 
-  if (submitted) return <SuccessMessage area={area} />;
+  if (submitted) return <SuccessMessage area={area} isUpdate={isUpdate}/>;
 
   return (
     <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02]">

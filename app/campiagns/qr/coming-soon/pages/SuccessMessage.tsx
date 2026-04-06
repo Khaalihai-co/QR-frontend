@@ -1,6 +1,6 @@
 "use client";
 
-export default function SuccessMessage({ area }: { area: string }) {
+export default function SuccessMessage({ area, isUpdate, }: { area: string; isUpdate: boolean }) {
   return (
     <div className="w-full max-w-md mx-auto 
     backdrop-blur-xl bg-white/10 border border-white/20 
@@ -11,12 +11,12 @@ export default function SuccessMessage({ area }: { area: string }) {
 
       {/* Heading */}
       <h2 className="text-2xl font-semibold text-white mb-2">
-        You’re on the list!
+        {isUpdate ? "You’re on the list" : "You're on the list!"}
       </h2>
 
       {/* Message */}
       <p className="text-gray-300 mb-4">
-        We’ll notify you when we launch in
+        {isUpdate ? "You've updated your information." : "You're all set!"} We’ll notify you when we launch in {area?.replaceAll("-", " ") || "your area"}.
       </p>
 
       {/* Area */}
@@ -26,7 +26,7 @@ export default function SuccessMessage({ area }: { area: string }) {
 
       {/* Footer */}
       <p className="text-xs text-gray-400 mt-6">
-        Thanks for joining us 🚀
+        {isUpdate ? "Thanks for staying with us" : "Thanks for joining us"} 
       </p>
     </div>
   );
