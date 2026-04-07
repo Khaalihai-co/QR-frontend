@@ -25,7 +25,7 @@ export default function LandingForm() {
     phone: "",
     location: "",
     area: "",
-    source: "qr",
+    source: "",
     userType: "",
   });
 
@@ -37,7 +37,7 @@ export default function LandingForm() {
     setFormData((prev) => ({
       ...prev,
       area: areaParam,
-      source: sourceParam === "qr" ? "qr" : "Link",
+      source: sourceParam === "qr" ? "qr" : "link",
     }));
 
     setArea(areaParam);
@@ -188,10 +188,10 @@ export default function LandingForm() {
             <button
               type="button"
               onClick={() =>
-                setFormData((prev) => ({ ...prev, userType: "renter" }))
+                setFormData((prev) => ({ ...prev, userType: "tenant" }))
               }
               className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 font-medium ${
-                formData.userType === "renter"
+                formData.userType === "tenant"
                   ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]"
                   : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
               }`}

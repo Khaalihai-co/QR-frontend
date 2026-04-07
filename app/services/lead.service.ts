@@ -1,6 +1,6 @@
-import { LeadPayload } from "@/app/types/lead";
-
 export const submitLead = async (data: LeadPayload) => {
+  console.log("Sending Data:", data);
+
   const response = await fetch(
     "https://api.qr.examresults.org.in/api/submissions",
     {
@@ -15,8 +15,8 @@ export const submitLead = async (data: LeadPayload) => {
   const result = await response.json();
 
   if (!response.ok) {
-    // backend ka actual error message throw karo
-    throw new Error(result.message || "Failed to submit");
+    console.error("Backend Error:", result);
+    throw new Error(result.message || JSON.stringify(result));
   }
 
   return result;
