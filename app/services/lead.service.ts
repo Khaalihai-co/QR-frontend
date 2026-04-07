@@ -1,3 +1,5 @@
+import { LeadPayload } from "../types/lead";
+
 export const submitLead = async (data: LeadPayload) => {
   console.log("Sending Data:", data);
 
