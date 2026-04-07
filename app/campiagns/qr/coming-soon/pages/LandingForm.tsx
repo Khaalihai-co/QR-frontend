@@ -13,13 +13,12 @@ export default function LandingForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isUpdate, setUpdate] = useState(false);
+
   const [errors, setErrors] = useState({
     name: "",
     phone: "",
     location: "",
-  })
-
-
+  });
 
   const [formData, setFormData] = useState<LeadPayload>({
     name: "",
@@ -32,7 +31,7 @@ export default function LandingForm() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const areaParam = params.get("area") || "Your Area"; // fallback
+    const areaParam = params.get("area") || "Your Area";
     const sourceParam = params.get("source");
 
     setFormData((prev) => ({
@@ -40,54 +39,63 @@ export default function LandingForm() {
       area: areaParam,
       source: sourceParam === "qr" ? "qr" : "direct",
     }));
- 
+
     setArea(areaParam);
   }, []);
 
+  // ✅ FIXED handleChange
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     let error = "";
 
+    // Name validation
     if (name === "name") {
-      if (!/^[a-zA-Z\s]+$/.test(value)) {
+      if (value && !/^[a-zA-Z\s]+$/.test(value)) {
         error = "Only letters and spaces allowed";
       }
     }
 
+    // Phone validation
     if (name === "phone") {
-      if (!/^\d{10}$/.test(value)) {
-        error = "Only 10 digit numbers allowed";
+      if (value && !/^\d+$/.test(value)) {
+        error = "Only numbers allowed";
+      } else if (value.length > 10) {
+        error = "Max 10 digits allowed";
+      } else if (value.length > 0 && value.length < 10) {
+        error = "Enter 10 digit number";
       }
     }
 
+    // Location validation
     if (name === "location") {
-      if (!/^[a-zA-Z\s]+$/.test(value)) {
+      if (value && !/^[a-zA-Z\s]+$/.test(value)) {
         error = "Only letters and spaces allowed";
       }
     }
 
-    if(errors.name || errors.phone || errors.location) {
-      alert("Please fix errors before submitting");
-      return;
-    }
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
 
-    setErrors({
-      ...errors,
-      [name]: error
-    });
-
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  // ✅ FIXED handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.phone || !formData.location) {
       alert("Please fill all fields");
+      return;
+    }
+
+    if (errors.name || errors.phone || errors.location) {
+      alert("Please fix errors before submitting");
       return;
     }
 
@@ -101,53 +109,45 @@ export default function LandingForm() {
       return;
     }
 
-
     try {
       setLoading(true);
 
-      console.log("Submitting:", formData); // debug
-
       const result = await submitLead(formData);
-
       const data = result.data;
 
-      const isUpdate = new Date(data.updatedAt).getTime() !== new Date(data.createdAt).getTime();
+      const isUpdate =
+        new Date(data.updatedAt).getTime() >
+        new Date(data.createdAt).getTime();
 
       setUpdate(isUpdate);
       setSubmitted(true);
-    }
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     catch (error: any) {
+    } catch (error: any) {
       console.error("Submission error:", error);
-      alert(error.message); // actual backend message
+      alert(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (submitted) return <SuccessMessage area={area} isUpdate={isUpdate}/>;
+  if (submitted)
+    return <SuccessMessage area={area} isUpdate={isUpdate} />;
 
   return (
     <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02]">
       <div className="shadow-xl rounded-2xl p-8 w-full max-w-md">
-        
         <Heading area={area} />
 
         <form onSubmit={handleSubmit} className="space-y-3">
-
-
+          
           <InputField
             name="name"
             placeholder="Your Name"
             value={formData.name}
             onChange={handleChange}
           />
-
           {errors.name && (
-            <p className="text-xs text-red-400 mt-1">
-              {errors.name}
-            </p>
+            <p className="text-xs text-red-400 mt-1">{errors.name}</p>
           )}
 
           <InputField
@@ -156,11 +156,8 @@ export default function LandingForm() {
             value={formData.phone}
             onChange={handleChange}
           />
-
           {errors.phone && (
-            <p className="text-xs text-red-400 mt-1">
-              {errors.phone}
-            </p>
+            <p className="text-xs text-red-400 mt-1">{errors.phone}</p>
           )}
 
           <InputField
@@ -169,46 +166,45 @@ export default function LandingForm() {
             value={formData.location}
             onChange={handleChange}
           />
-
           {errors.location && (
-            <p className="text-xs text-red-400 mt-1">
-              {errors.location}
-            </p>
+            <p className="text-xs text-red-400 mt-1">{errors.location}</p>
           )}
 
           <div className="flex w-full gap-4">
             <button
-            type="button"
-            onClick={() => 
-              setFormData({ ...formData, userType: "owner"})
-            }
-            className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 w-30 font-medium ${
-              formData.userType === "owner" ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]" : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
-            }`}
-          >
-          Owner
-          </button>
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({ ...prev, userType: "owner" }))
+              }
+              className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 font-medium ${
+                formData.userType === "owner"
+                  ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]"
+                  : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
+              }`}
+            >
+              Owner
+            </button>
 
-
-          <button
-            type="button"
-            onClick={() => 
-              setFormData({ ...formData, userType: "renter"})
-            }
-            className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 w-30 font-medium ${
-              formData.userType === "renter" ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]" : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
-            }`}
-          >
-          Renter
-          </button>
+            <button
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({ ...prev, userType: "renter" }))
+              }
+              className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 font-medium ${
+                formData.userType === "renter"
+                  ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]"
+                  : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
+              }`}
+            >
+              Renter
+            </button>
           </div>
-          
 
           <Button loading={loading}>Join Waitlist</Button>
 
           <p className="text-xs text-gray-400 text-center mt-4 font-bold">
-  We respect your privacy. No spam.
-</p>
+            We respect your privacy. No spam.
+          </p>
         </form>
       </div>
     </div>
