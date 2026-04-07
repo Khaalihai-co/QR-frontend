@@ -13,6 +13,11 @@ export default function LandingForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isUpdate, setUpdate] = useState(false);
+  const [errors, setErrors] = useState({
+    name: "",
+    phone: "",
+    Location: "",
+  })
 
   const [formData, setFormData] = useState<LeadPayload>({
     name: "",
@@ -36,6 +41,27 @@ export default function LandingForm() {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    let error = "";
+
+    if (name === "name") {
+      if (!/^[a-zA-Z\s]+$/.test(value)) {
+        error = "Only letters and spaces allowed";
+      }
+    }
+
+    if (name === "phone") {
+      if (!/^\d{10}$/.test(value)) {
+        error = "Only 10 digit numbers allowed";
+      }
+    }
+
+    setErrors({
+      ...errors,
+      [name]: error
+    });
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -103,12 +129,24 @@ export default function LandingForm() {
             onChange={handleChange}
           />
 
+          {errors.name && (
+            <p className="text-xs text-red-400 mt-1">
+              {errors.name}
+            </p>
+          )}
+
           <InputField
             name="phone"
             placeholder="Phone Number"
             value={formData.phone}
             onChange={handleChange}
           />
+
+          {errors.phone && (
+            <p className="text-xs text-red-400 mt-1">
+              {errors.phone}
+            </p>
+          )}
 
           <InputField
             name="location"
