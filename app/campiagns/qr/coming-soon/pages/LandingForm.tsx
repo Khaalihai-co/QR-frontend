@@ -19,6 +19,8 @@ export default function LandingForm() {
     Location: "",
   })
 
+
+
   const [formData, setFormData] = useState<LeadPayload>({
     name: "",
     phone: "",
@@ -31,13 +33,15 @@ export default function LandingForm() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const areaParam = params.get("area") || "Your Area"; // fallback
-
-    setArea(areaParam);
+    const sourceParam = params.get("source");
 
     setFormData((prev) => ({
       ...prev,
       area: areaParam,
+      source: sourceParam === "qr" ? "qr" : "direct",
     }));
+ 
+    setArea(areaParam);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +59,17 @@ export default function LandingForm() {
       if (!/^\d{10}$/.test(value)) {
         error = "Only 10 digit numbers allowed";
       }
+    }
+
+    if (name === "location") {
+      if (!/^[a-zA-Z\s]+$/.test(value)) {
+        error = "Only letters and spaces allowed";
+      }
+    }
+
+    if(errors.name || errors.phone || errors.Location) {
+      alert("Please fix errors before submitting");
+      return;
     }
 
     setErrors({
@@ -154,6 +169,12 @@ export default function LandingForm() {
             value={formData.location}
             onChange={handleChange}
           />
+
+          {errors.location && (
+            <p className="text-xs text-red-400 mt-1">
+              {errors.location}
+            </p>
+          )}
 
           <div className="flex w-full gap-4">
             <button
