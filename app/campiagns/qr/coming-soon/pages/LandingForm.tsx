@@ -37,7 +37,7 @@ export default function LandingForm() {
     setFormData((prev) => ({
       ...prev,
       area: areaParam,
-      source: sourceParam === "qr" ? "qr" : "link",
+      source: sourceParam === "qr" ? "qr" : "direct",
     }));
 
     setArea(areaParam);
