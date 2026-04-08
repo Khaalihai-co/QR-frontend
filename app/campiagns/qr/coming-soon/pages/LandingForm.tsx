@@ -25,8 +25,8 @@ export default function LandingForm() {
     phone: "",
     location: "",
     area: "",
-    source: "",
-    userType: "",
+    source: "qr",
+    userType: "owner",
   });
 
   useEffect(() => {
