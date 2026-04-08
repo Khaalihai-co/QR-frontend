@@ -44,6 +44,11 @@ export default function LandingForm() {
   }, []);
 
   const validateForm = () => {
+    
+    if(!formData.name || !formData.phone || !formData.location) {
+      return "Please fill in all required fields.";
+    }
+
     if(!formData.name || !/^[a-zA-Z\s]+$/.test(formData.name)) {
       return "Invalid name. Only letters and spaces allowed.";
   }
@@ -52,7 +57,7 @@ export default function LandingForm() {
       return "Invalid phone number. Enter a 10 digit number.";
   }
 
-  if(!formData.location || !/^[a-zA-Z\s-]+$/.test(formData.location)) {
+  if(!formData.location || !/^[a-zA-Z\s,-]+$/.test(formData.location)) {
       return "Invalid location. Only letters and spaces allowed.";
   }
 
@@ -89,7 +94,7 @@ export default function LandingForm() {
 
     // Location validation
     if (name === "location") {
-      if (value && !/^[a-zA-Z\s-]+$/.test(value)) {
+      if (value && !/^[a-zA-Z\s,-]+$/.test(value)) {
         error = "Only letters and spaces allowed";
       }
     }
