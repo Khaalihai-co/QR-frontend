@@ -43,6 +43,26 @@ export default function LandingForm() {
     setArea(areaParam);
   }, []);
 
+  const validateForm = () => {
+    if(!formData.name || !/^[a-zA-Z\s]+$/.test(formData.name)) {
+      return "Invalid name. Only letters and spaces allowed.";
+  }
+
+  if(!/^\d{10}$/.test(formData.phone)) {
+      return "Invalid phone number. Enter a 10 digit number.";
+  }
+
+  if(!formData.location || !/^[a-zA-Z\s]+$/.test(formData.location)) {
+      return "Invalid location. Only letters and spaces allowed.";
+  }
+
+  if(!formData.userType) {
+      return "Please select Owner or Renter.";
+  }
+
+  return "";
+}
+
   // ✅ FIXED handleChange
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,35 +109,21 @@ export default function LandingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.phone || !formData.location) {
-      alert("Please fill all fields");
+    const errorMsg = validateForm();
+    if(errorMsg){
+      alert(errorMsg);
       return;
     }
 
-    if (errors.name || errors.phone || errors.location) {
-      alert("Please fix errors before submitting");
-      return;
-    }
-
-    if (formData.phone.length !== 10) {
-      alert("Enter valid 10 digit phone number");
-      return;
-    }
-
-    if (!formData.userType) {
-      alert("Please select Owner or Renter");
-      return;
-    }
-
-    try {
+    try{
       setLoading(true);
 
-      const result = await submitLead(formData);
-      const data = result.data;
+    const result = await submitLead(formData);
+    const data = result.data;
 
-      const isUpdate =
-        new Date(data.updatedAt).getTime() >
-        new Date(data.createdAt).getTime();
+    const isUpdate =
+      new Date(data.updatedAt).getTime() >
+      new Date(data.createdAt).getTime();
 
       setUpdate(isUpdate);
       setSubmitted(true);
