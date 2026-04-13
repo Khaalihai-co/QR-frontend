@@ -43,7 +43,7 @@ export default function LandingForm() {
     setArea(areaParam);
   }, []);
 
-  const validateForm = () => {
+  const validateForm = () => { 
     
     if(!formData.name || !formData.phone || !formData.location) {
       return "Please fill in all required fields.";

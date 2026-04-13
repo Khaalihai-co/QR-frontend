@@ -3,7 +3,7 @@ import { LeadPayload } from "@/app/types/lead";
 export const submitLead = async (data: LeadPayload) => {
   console.log("API Payload:", data); // ✅ DEBUG
 
-  const response = await fetch("http://localhost:5000/api/submissions", {
+  const response = await fetch("https://api.qr.examresults.org.in/api/submissions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
