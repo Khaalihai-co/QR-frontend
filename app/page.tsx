@@ -8,7 +8,7 @@ export default function Page() {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowForm(true), 2500);
+    const timer = setTimeout(() => setShowForm(true), 1000);
 
     const handleScroll = () => {
       if (window.scrollY > 60) setShowForm(true);
@@ -30,38 +30,33 @@ export default function Page() {
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-125 h-125 bg-white/5 blur-[140px] rounded-full" />
       </div>
 
-      <div className="relative z-10 w-full max-w-lg text-center space-y-10">
+      <div className="relative z-10 w-full max-w-lg text-center space-y-5">
 
         {/* 🔥 LOGO */}
         <div className="flex justify-center mb-4">
-          <Image
-            src="/QR.png"
-            alt="Khaalihai"
-            width={120}
-            height={120}
-            className="opacity-90 rounded-2xl"
-            priority
-          />
-        </div>
+  <div className="relative w-35 h-35 rounded-full overflow-hidden bg-white p-6">
+    <Image
+      src="/Khaalihai-logo.png"
+      alt="Khaalihai"
+      fill
+      className="object-contain"
+      priority
+    />
+  </div>
+</div>
 
         {/* 🔥 BLOCK 1 */}
         <p className="text-xs tracking-widest text-gray-500 uppercase">
           Coming Soon
         </p>
 
-        {/* 🔥 BLOCK 2 */}
-        <h1 className="text-5xl font-semibold leading-tight">
-          Something new is
-          <br />
-          coming to your area
-        </h1>
 
-        {/* 🔥 BLOCK 3 */}
-        <p className="text-base text-gray-400 leading-relaxed">
+        {/* 🔥 BLOCK 2 */}
+        <p className="text-base text-gray-400 leading-relaxed font-bold">
           We’re building a better local experience.
         </p>
 
-        {/* 🔥 BLOCK 4 */}
+        {/* 🔥 BLOCK 3 */}
         <p className="text-sm text-gray-500">
           Launching shortly
         </p>

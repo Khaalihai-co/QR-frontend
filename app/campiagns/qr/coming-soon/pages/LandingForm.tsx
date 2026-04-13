@@ -213,7 +213,7 @@ export default function LandingForm() {
 
           <Button loading={loading}>Join Waitlist</Button>
 
-          <p className="text-xs text-gray-400 text-center mt-4 font-bold">
+          <p className="text-xs text-gray-400 text-center mt-4 font-semibold">
             We respect your privacy. No spam.
           </p>
         </form>
