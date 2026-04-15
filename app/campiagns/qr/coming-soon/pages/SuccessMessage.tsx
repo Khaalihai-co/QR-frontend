@@ -3,7 +3,7 @@
 export default function SuccessMessage({ area, isUpdate, }: { area: string; isUpdate: boolean }) {
   return (
     <div className="w-full max-w-md mx-auto 
-    backdrop-blur-xl bg-white/10 border border-white/20 
+    backdrop-blur-xl bg-yellow-500 border border-white/20 
     rounded-2xl p-8 shadow-2xl text-center">
 
       {/* Icon */}
@@ -20,12 +20,12 @@ export default function SuccessMessage({ area, isUpdate, }: { area: string; isUp
       </p>
 
       {/* Area */}
-      <p className="text-yellow-400 text-lg font-medium capitalize">
+      <p className="text-black text-lg font-semibold capitalize">
         {area?.replaceAll("-", " ") || "your area"}
       </p>
 
       {/* Footer */}
-      <p className="text-xs text-gray-400 mt-6">
+      <p className="text-xs text-gray-600 mt-6">
         {isUpdate ? "Thanks for staying with us" : "Thanks for joining us"} 
       </p>
     </div>
