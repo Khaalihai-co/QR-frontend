@@ -15,7 +15,7 @@ export default function SuccessMessage({ area, isUpdate, }: { area: string; isUp
       </h2>
 
       {/* Message */}
-      <p className="text-gray-300 mb-4">
+      <p className="text-black mb-4">
         {isUpdate ? "You've updated your information." : "You're all set!"} We’ll notify you when we launch in {area?.replaceAll("-", " ") || "your area"}.
       </p>
 
