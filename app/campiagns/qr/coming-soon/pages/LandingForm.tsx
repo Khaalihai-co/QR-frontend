@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Heading from "./Heading";
 import SuccessMessage from "./SuccessMessage";
 import Button from "@/app/component/Button";
@@ -13,6 +13,21 @@ export default function LandingForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isUpdate, setUpdate] = useState(false);
+
+  // 🔥 Location states
+  const [locationQuery, setLocationQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const locations = [
+    "Sangam-Vihar",
+    "Devli",
+    "Tara-Apartment",
+    "Prahladpur",
+    "Tughlakabad",
+    "Govindpuri",
+    "Other",
+  ];
 
   const [errors, setErrors] = useState({
     name: "",
@@ -29,6 +44,7 @@ export default function LandingForm() {
     userType: "",
   });
 
+  // ✅ URL params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const areaParam = params.get("area") || "Your Area";
@@ -43,98 +59,100 @@ export default function LandingForm() {
     setArea(areaParam);
   }, []);
 
-  const validateForm = () => { 
-    
-    if(!formData.name || !formData.phone || !formData.location) {
+  // ✅ Click outside close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // ✅ Validation
+  const validateForm = () => {
+    if (!formData.name || !formData.phone || !formData.location) {
       return "Please fill in all required fields.";
     }
 
-    if(!formData.name || !/^[a-zA-Z\s]+$/.test(formData.name)) {
-      return "Invalid name. Only letters and spaces allowed.";
-  }
+    if (!/^[a-zA-Z\s]+$/.test(formData.name)) {
+      return "Invalid name.";
+    }
 
-  if(!/^\d{10}$/.test(formData.phone)) {
-      return "Invalid phone number. Enter a 10 digit number.";
-  }
+    if (!/^\d{10}$/.test(formData.phone)) {
+      return "Invalid phone number.";
+    }
 
-  if(!formData.location || !/^[a-zA-Z\s,-]+$/.test(formData.location)) {
-      return "Invalid location. Only letters and spaces allowed.";
-  }
+    if (!/^[a-zA-Z\s,-]+$/.test(formData.location)) {
+      return "Invalid location.";
+    }
 
-  if(!formData.userType) {
+    if (!formData.userType) {
       return "Please select Owner or Renter.";
-  }
+    }
 
-  return "";
-}
+    return "";
+  };
 
-  // ✅ FIXED handleChange
+  // ✅ Input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     let error = "";
 
-    // Name validation
-    if (name === "name") {
-      if (value && !/^[a-zA-Z\s]+$/.test(value)) {
-        error = "Only letters and spaces allowed";
-      }
+    if (name === "name" && value && !/^[a-zA-Z\s]+$/.test(value)) {
+      error = "Only letters allowed";
     }
 
-    // Phone validation
     if (name === "phone") {
       if (value && !/^\d+$/.test(value)) {
         error = "Only numbers allowed";
       } else if (value.length > 10) {
-        error = "Max 10 digits allowed";
-      } else if (value.length > 0 && value.length < 10) {
-        error = "Enter 10 digit number";
+        error = "Max 10 digits";
       }
     }
 
-    // Location validation
-    if (name === "location") {
-      if (value && !/^[a-zA-Z\s,-]+$/.test(value)) {
-        error = "Only letters and spaces allowed";
-      }
+    if (name === "location" && value && !/^[a-zA-Z\s,-]+$/.test(value)) {
+      error = "Invalid location";
     }
 
-    setErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
+    setErrors((prev) => ({ ...prev, [name]: error }));
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ FIXED handleSubmit
+  // ✅ Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const errorMsg = validateForm();
-    if(errorMsg){
+    if (errorMsg) {
       alert(errorMsg);
       return;
     }
 
-    try{
+    try {
       setLoading(true);
 
-    const result = await submitLead(formData);
-    const data = result.data;
+      const result = await submitLead(formData);
+      const data = result.data;
 
-    const isUpdate =
-      new Date(data.updatedAt).getTime() >
-      new Date(data.createdAt).getTime();
+      const isUpdate =
+        new Date(data.updatedAt).getTime() >
+        new Date(data.createdAt).getTime();
 
       setUpdate(isUpdate);
       setSubmitted(true);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Submission error:", error);
       alert(error.message);
     } finally {
       setLoading(false);
@@ -145,7 +163,7 @@ export default function LandingForm() {
     return <SuccessMessage area={area} isUpdate={isUpdate} />;
 
   return (
-    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
       <div className="shadow-xl rounded-2xl p-8 w-full max-w-md">
         <Heading area={area} />
 
@@ -157,9 +175,7 @@ export default function LandingForm() {
             value={formData.name}
             onChange={handleChange}
           />
-          {errors.name && (
-            <p className="text-xs text-red-400 mt-1">{errors.name}</p>
-          )}
+          {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
 
           <InputField
             name="phone"
@@ -167,30 +183,68 @@ export default function LandingForm() {
             value={formData.phone}
             onChange={handleChange}
           />
-          {errors.phone && (
-            <p className="text-xs text-red-400 mt-1">{errors.phone}</p>
-          )}
+          {errors.phone && <p className="text-xs text-red-400">{errors.phone}</p>}
 
-          <InputField
-            name="location"
-            placeholder="Your Location"
-            value={formData.location}
-            onChange={handleChange}
-          />
+          {/* 🔥 LOCATION FIELD */}
+          <div ref={dropdownRef} className="relative">
+            <input
+              type="text"
+              placeholder="Search your location"
+              value={locationQuery}
+              onChange={(e) => {
+                const value = e.target.value;
+                setLocationQuery(value);
+                setShowDropdown(true);
+
+                setFormData((prev) => ({
+                  ...prev,
+                  location: value,
+                }));
+              }}
+              onFocus={() => setShowDropdown(true)}
+              className="w-full border p-3 rounded-xl bg-white/5 text-gray-300"
+            />
+
+            {showDropdown && (
+              <div className="absolute w-full bg-black border border-white/10 rounded-xl mt-1 max-h-40 overflow-y-auto hide-scrollbar z-10">
+                {locations
+                  .filter((loc) =>
+                    loc.toLowerCase().includes(locationQuery.toLowerCase())
+                  )
+                  .map((loc, i) => (
+                    <div
+                      key={i}
+                      onClick={() => {
+                        setLocationQuery(loc);
+                        setFormData((prev) => ({
+                          ...prev,
+                          location: loc,
+                        }));
+                        setShowDropdown(false);
+                      }}
+                      className="p-3 cursor-pointer hover:bg-white/10"
+                    >
+                      {loc}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+
           {errors.location && (
-            <p className="text-xs text-red-400 mt-1">{errors.location}</p>
+            <p className="text-xs text-red-400">{errors.location}</p>
           )}
 
-          <div className="flex w-full gap-4">
+          <div className="flex gap-4">
             <button
               type="button"
               onClick={() =>
                 setFormData((prev) => ({ ...prev, userType: "owner" }))
               }
-              className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 font-medium ${
+              className={`flex-1 py-3 rounded-xl ${
                 formData.userType === "owner"
-                  ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]"
-                  : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
+                  ? "bg-white text-black"
+                  : "bg-white/10 text-gray-300"
               }`}
             >
               Owner
@@ -201,10 +255,10 @@ export default function LandingForm() {
               onClick={() =>
                 setFormData((prev) => ({ ...prev, userType: "tenant" }))
               }
-              className={`flex-1 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 font-medium ${
+              className={`flex-1 py-3 rounded-xl ${
                 formData.userType === "tenant"
-                  ? "bg-white text-black border-white-400 shadow-lg scale-[1.03]"
-                  : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10"
+                  ? "bg-white text-black"
+                  : "bg-white/10 text-gray-300"
               }`}
             >
               Renter
@@ -212,10 +266,6 @@ export default function LandingForm() {
           </div>
 
           <Button loading={loading}>Join Waitlist</Button>
-
-          <p className="text-xs text-gray-400 text-center mt-4 font-semibold">
-            We respect your privacy. No spam.
-          </p>
         </form>
       </div>
     </div>
